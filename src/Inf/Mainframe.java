@@ -6,6 +6,10 @@
 
 package Inf;
 
+import Codes.DBconnect;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import javax.swing.JOptionPane;
 /**
  *
  * @author Lakkantha
@@ -13,8 +17,12 @@ package Inf;
 public class Mainframe extends javax.swing.JFrame {
 
     /** Creates new form Mainframe */
+    Connection conn = null;
+    PreparedStatement pat = null;
+    
     public Mainframe() {
         initComponents();
+        conn = DBconnect.connect();
     }
 
     /** This method is called from within the constructor to
@@ -35,9 +43,9 @@ public class Mainframe extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        name = new javax.swing.JTextField();
-        age = new javax.swing.JTextField();
-        grade = new javax.swing.JComboBox<>();
+        namebox = new javax.swing.JTextField();
+        agebox = new javax.swing.JTextField();
+        gradebox = new javax.swing.JComboBox<>();
         jPanel6 = new javax.swing.JPanel();
         insertbtn = new javax.swing.JButton();
         updatebtn = new javax.swing.JButton();
@@ -89,18 +97,18 @@ public class Mainframe extends javax.swing.JFrame {
         jLabel3.setText("Grade");
         jPanel5.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 90, -1, -1));
 
-        name.setToolTipText("Enter your name");
-        jPanel5.add(name, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 10, 150, -1));
+        namebox.setToolTipText("Enter your name");
+        jPanel5.add(namebox, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 10, 150, -1));
 
-        age.addActionListener(new java.awt.event.ActionListener() {
+        agebox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ageActionPerformed(evt);
+                ageboxActionPerformed(evt);
             }
         });
-        jPanel5.add(age, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 50, 150, -1));
+        jPanel5.add(agebox, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 50, 150, -1));
 
-        grade.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "select", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13" }));
-        jPanel5.add(grade, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 90, -1, -1));
+        gradebox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "select", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13" }));
+        jPanel5.add(gradebox, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 90, -1, -1));
 
         jPanel4.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 100, 220, 200));
 
@@ -109,6 +117,11 @@ public class Mainframe extends javax.swing.JFrame {
 
         insertbtn.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         insertbtn.setText("insert");
+        insertbtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                insertbtnActionPerformed(evt);
+            }
+        });
         jPanel6.add(insertbtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 11, -1, -1));
 
         updatebtn.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
@@ -166,13 +179,36 @@ public class Mainframe extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void ageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ageActionPerformed
+    private void ageboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ageboxActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_ageActionPerformed
+    }//GEN-LAST:event_ageboxActionPerformed
 
     private void updatebtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updatebtnActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_updatebtnActionPerformed
+
+    private void insertbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_insertbtnActionPerformed
+        // TODO add your handling code here:
+        String name;
+        int age;
+        int grade;
+        
+        name = namebox.getText();
+        age = Integer.parseInt(agebox.getText());
+        grade = Integer.parseInt(gradebox.getSelectedItem().toString());
+        
+        try {
+             String sql = "INSERT INTO student(sname,sage,sgrade) VALUES('"+name+"','"+age+"','"+grade+"')";
+             pat = conn.prepareStatement(sql);
+             pat.execute();
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+            
+        }
+        
+        
+    }//GEN-LAST:event_insertbtnActionPerformed
 
     /**
      * @param args the command line arguments
@@ -210,10 +246,10 @@ public class Mainframe extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextField age;
+    private javax.swing.JTextField agebox;
     private javax.swing.JButton clearbtn;
     private javax.swing.JButton deletebtn;
-    private javax.swing.JComboBox<String> grade;
+    private javax.swing.JComboBox<String> gradebox;
     private javax.swing.JButton insertbtn;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
@@ -226,7 +262,7 @@ public class Mainframe extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField name;
+    private javax.swing.JTextField namebox;
     private javax.swing.JTextField searchbox;
     private javax.swing.JTable table1;
     private javax.swing.JButton updatebtn;

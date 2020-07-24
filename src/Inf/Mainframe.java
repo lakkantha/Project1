@@ -7,9 +7,12 @@
 package Inf;
 
 import Codes.DBconnect;
+import com.mysql.cj.protocol.Resultset;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import javax.swing.JOptionPane;
+import net.proteanit.sql.DbUtils;
 /**
  *
  * @author Lakkantha
@@ -19,10 +22,79 @@ public class Mainframe extends javax.swing.JFrame {
     /** Creates new form Mainframe */
     Connection conn = null;
     PreparedStatement pat = null;
+    Resultset rs = null;
     
     public Mainframe() {
         initComponents();
         conn = DBconnect.connect();
+        tableload();
+        
+    }
+    
+    public void  tableload() {
+    
+        try {
+            String sql = "Select * from student";
+            pat = conn.prepareStatement(sql);
+            rs = (Resultset) pat.executeQuery();
+            table1.setModel(DbUtils.resultSetToTableModel((ResultSet) rs));
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+            
+        }
+    
+    
+    }
+    
+    public void tabledata(){
+    
+    int r = table1.getSelectedRow();
+    
+    String id = table1.getValueAt(r, 0).toString();
+    String name = table1.getValueAt(r, 1).toString();
+    String age = table1.getValueAt(r, 2).toString();
+    String grade = table1.getValueAt(r, 3).toString();
+    
+    IDbox.setText(id);
+    namebox.setText(name);
+    agebox.setText(age);
+    gradebox.setSelectedItem(grade);
+    
+    
+    }
+    
+    public void search(){
+    
+        String srh = searchbox.getText();
+        
+        try {
+            String sql = "Select * from student where sname LIKE'%"+srh+"%' OR id LIKE '%"+srh+"%'" ;
+            pat = conn.prepareStatement(sql);
+            rs = (Resultset) pat.executeQuery();
+            table1.setModel(DbUtils.resultSetToTableModel((ResultSet) rs));
+            
+            
+        } catch (Exception e) {
+            
+            JOptionPane.showMessageDialog(null, e);
+            
+            
+        }
+    
+    
+    
+    }
+    
+    public void clear(){
+    
+    searchbox.setText("");
+    IDbox.setText("ID");
+    namebox.setText("");
+    agebox.setText("");
+    gradebox.setSelectedItem(0);
+    
+    
     }
 
     /** This method is called from within the constructor to
@@ -52,6 +124,8 @@ public class Mainframe extends javax.swing.JFrame {
         deletebtn = new javax.swing.JButton();
         clearbtn = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
+        IDbox = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         table1 = new javax.swing.JTable();
 
@@ -78,6 +152,12 @@ public class Mainframe extends javax.swing.JFrame {
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Search"));
         jPanel3.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        searchbox.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                searchboxKeyTyped(evt);
+            }
+        });
         jPanel3.add(searchbox, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 20, 180, 30));
 
         jPanel4.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 230, 60));
@@ -135,17 +215,38 @@ public class Mainframe extends javax.swing.JFrame {
 
         deletebtn.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         deletebtn.setText("delete");
+        deletebtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deletebtnActionPerformed(evt);
+            }
+        });
         jPanel6.add(deletebtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, -1, -1));
 
         clearbtn.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         clearbtn.setText("clear");
+        clearbtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clearbtnActionPerformed(evt);
+            }
+        });
         jPanel6.add(clearbtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 70, -1, -1));
 
         jButton1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jButton1.setText("exit");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
         jPanel6.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 110, -1, -1));
 
         jPanel4.add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 330, 230, 140));
+
+        jLabel4.setText("ID");
+        jPanel4.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 80, -1, -1));
+
+        IDbox.setText("ID");
+        jPanel4.add(IDbox, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 80, -1, -1));
 
         jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 257, 490));
 
@@ -161,6 +262,16 @@ public class Mainframe extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        table1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                table1MouseClicked(evt);
+            }
+        });
+        table1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                table1KeyReleased(evt);
+            }
+        });
         jScrollPane1.setViewportView(table1);
 
         jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(263, 0, 488, 234));
@@ -184,7 +295,23 @@ public class Mainframe extends javax.swing.JFrame {
     }//GEN-LAST:event_ageboxActionPerformed
 
     private void updatebtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updatebtnActionPerformed
-        // TODO add your handling code here:
+        
+         String id = IDbox.getText();
+         String name = namebox.getText();
+         String age = agebox.getText();
+         String grade = gradebox.getSelectedItem().toString();
+         
+         try {
+            String sql = "update student set sname='"+name+"',sage='"+age+"',sgrade='"+grade+"' where id='"+id+"' ";
+            pat = conn.prepareStatement(sql);
+            pat.execute();
+            JOptionPane.showMessageDialog(null, "Data sucessfully updated");
+            
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+         tableload();
     }//GEN-LAST:event_updatebtnActionPerformed
 
     private void insertbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_insertbtnActionPerformed
@@ -201,14 +328,59 @@ public class Mainframe extends javax.swing.JFrame {
              String sql = "INSERT INTO student(sname,sage,sgrade) VALUES('"+name+"','"+age+"','"+grade+"')";
              pat = conn.prepareStatement(sql);
              pat.execute();
+             JOptionPane.showMessageDialog(null, "Data sucessfully insert");
 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);
             
         }
-        
+        tableload();
         
     }//GEN-LAST:event_insertbtnActionPerformed
+
+    private void table1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_table1MouseClicked
+        tabledata();// TODO add your handling code here:
+    }//GEN-LAST:event_table1MouseClicked
+
+    private void table1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_table1KeyReleased
+          tabledata();        // TODO add your handling code here:
+    }//GEN-LAST:event_table1KeyReleased
+
+    private void searchboxKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_searchboxKeyTyped
+      
+        search();// TODO add your handling code here:
+    }//GEN-LAST:event_searchboxKeyTyped
+
+    private void deletebtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deletebtnActionPerformed
+           
+        
+       int check = JOptionPane.showConfirmDialog(null, "DO you want delete it?");
+       
+       if( check ==0){
+        String id = IDbox.getText();
+         
+           try {
+                String sql = "delete from  student where id='"+id+"'";
+                pat = conn.prepareStatement(sql);
+                pat.execute();
+                JOptionPane.showMessageDialog(null,"sucessfully delete");
+           } catch (Exception e) {
+           
+           JOptionPane.showMessageDialog(null,e);
+           }
+       
+       }
+       tableload();
+       clear();
+    }//GEN-LAST:event_deletebtnActionPerformed
+
+    private void clearbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearbtnActionPerformed
+        clear();// TODO add your handling code here:
+    }//GEN-LAST:event_clearbtnActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+           System.exit(0);        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -246,6 +418,7 @@ public class Mainframe extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel IDbox;
     private javax.swing.JTextField agebox;
     private javax.swing.JButton clearbtn;
     private javax.swing.JButton deletebtn;
@@ -255,6 +428,7 @@ public class Mainframe extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
